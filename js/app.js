@@ -746,6 +746,7 @@ class CashflowApp {
 
     collectData() {
         const data = {
+            playerName: (document.getElementById('playerName') || {}).value || '',
             salary: this.getNumberValue('salary'),
             savings: this.getNumberValue('savings'),
             perChildExpense: this.getNumberValue('perChildExpense'),
@@ -882,6 +883,7 @@ class CashflowApp {
 
     restoreData(data) {
         // Restore simple fields
+        if (data.playerName !== undefined) { const pn = document.getElementById('playerName'); if (pn) pn.value = data.playerName; }
         if (data.salary !== undefined) document.getElementById('salary').value = data.salary;
         if (data.savings !== undefined) document.getElementById('savings').value = data.savings;
         if (data.perChildExpense !== undefined) document.getElementById('perChildExpense').value = data.perChildExpense;

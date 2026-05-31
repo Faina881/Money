@@ -35,6 +35,36 @@ header h1 {
     font-size: 1.8rem;
 }
 
+.header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.player-name-input {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 2px solid #bdc3c7;
+    border-radius: 20px;
+    outline: none;
+    color: #2c3e50;
+    background: #f8f9fa;
+    width: 200px;
+    transition: border-color 0.2s;
+}
+
+.player-name-input:focus {
+    border-color: #3498db;
+    background: #fff;
+}
+
+.player-name-input::placeholder {
+    color: #aaa;
+    font-weight: 400;
+}
+
 .session-controls {
     display: flex;
     gap: 10px;
@@ -145,6 +175,24 @@ header h1 {
     header h1 {
         color: #fff;
         font-size: 1.2rem;
+    }
+
+    .header-top {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+
+    .player-name-input {
+        width: 100%;
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.3);
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .player-name-input::placeholder {
+        color: rgba(255,255,255,0.6);
     }
 
     .session-controls {
