@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деньги есть</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Деньги есть</h1>
+            <div class="session-controls">
+                <select id="sessionSelect">
+                    <option value="">Новая игра</option>
+                </select>
+                <button id="saveBtn" class="btn-primary">Сохранить</button>
+                <button id="loadBtn" class="btn-secondary">Загрузить</button>
+                <button id="deleteBtn" class="btn-danger">Удалить</button>
+            </div>
+        </header>
+
+        <div class="form-grid">
+            <!-- Доходы -->
+            <section class="section">
+                <h2>Доходы</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td class="label">Зарплата</td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="salary" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="Введите значение">
+                                    <button id="salaryConfirmBtn" class="btn-confirm">✓</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3>Недвижимость</h3>
+                    <table class="data-table" id="realEstateIncome">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Доход</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="input-row">
+                                <td>
+                                    <div class="custom-multiselect">
+                                        <div class="multiselect-trigger">Выберите недвижимость</div>
+                                        <div class="multiselect-options">
+                                            <div class="multiselect-option" data-value="квартира на продажу 2/1">квартира на продажу 2/1</div>
+                                            <div class="multiselect-option" data-value="дом на продажу 3/2">дом на продажу 3/2</div>
+                                            <div class="multiselect-option" data-value="дуплекс на продажу">дуплекс на продажу</div>
+                                            <div class="multiselect-option" data-value="4-плекс на продажу">4-плекс на продажу</div>
+                                            <div class="multiselect-option" data-value="8-плекс на продажу">8-плекс на продажу</div>
+                                            <div class="multiselect-option" data-value="многоквартирный дом на продажу">многоквартирный дом на продажу</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="currency-input income-val income-field" value="0" inputmode="numeric" maxlength="10"></td>
+                                <td><button class="btn-icon add-row" data-table="realEstateIncome">+</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Бизнес</h3>
+                    <table class="data-table" id="businessIncome">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Доход</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="input-row">
+                                <td>
+                                    <div class="custom-multiselect">
+                                        <div class="multiselect-trigger">Выберите бизнес</div>
+                                        <div class="multiselect-options">
+                                            <div class="multiselect-option" data-value="Предприятие на продажу">Предприятие на продажу</div>
+                                            <div class="multiselect-option" data-value="Партнер с ООО">Партнер с ООО</div>
+                                            <div class="multiselect-option" data-value="Пиццерия">Пиццерия</div>
+                                            <div class="multiselect-option" data-value="Автомойка">Автомойка</div>
+                                            <div class="multiselect-option" data-value="Пансионат">Пансионат</div>
+                                            <div class="multiselect-option" data-value="Торговый пассаж">Торговый пассаж</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="currency-input income-val income-field" value="0" inputmode="numeric" maxlength="4"></td>
+                                <td><button class="btn-icon add-row" data-table="businessIncome">+</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-footer">табл. Доходы</div>
+                </div>
+            </section>
+
+            <!-- Расходы -->
+            <section class="section">
+                <h2>Расходы</h2>
+                <div class="table-container">
+                    <table class="data-table" id="expenses">
+                        <tbody>
+                            <tr>
+                                <td class="label">Выплата по ипотеке</td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="mortgagePayment" class="currency-input expense-val income-field" value="" inputmode="numeric" maxlength="10" placeholder="Введите значение">
+                                    <button id="mortgagePaymentConfirmBtn" class="btn-confirm">✓</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Расходы на жизнь</td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="otherExpenses" class="currency-input expense-val income-field" value="" inputmode="numeric" maxlength="10" placeholder="Введите значение">
+                                    <button id="otherExpensesConfirmBtn" class="btn-confirm">✓</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Расходы на детей</td>
+                                <td><input type="number" id="childExpenses" class="currency-input expense-val" value="0" readonly style="background:#ecf0f1;color:#555;cursor:not-allowed;"></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Выплата по банковскому кредиту</td>
+                                <td><input type="number" id="bankLoanPayment" class="currency-input expense-val" value="0" readonly style="background:#ecf0f1;color:#555;cursor:not-allowed;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-footer">табл. Расходы</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Текущая ситуация -->
+        <section class="section summary-section">
+            <h2>Текущая ситуация:</h2>
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+            <div class="balance-block">
+                <div class="balance-label">Текущий баланс</div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="text" id="currentBalance" class="balance-display-input" value="0" inputmode="numeric" maxlength="10" readonly>
+                    <button id="balanceEditBtn" class="btn-confirm" style="width:28px;height:28px;">✎</button>
+                </div>
+                <div class="balance-controls">
+                    <div class="balance-input-row">
+                        <input type="text" id="balanceInput" class="currency-input" inputmode="numeric" maxlength="10" placeholder="Добавить Расход / Доход" style="flex:1;">
+                    </div>
+                    <div class="balance-btn-row">
+                        <button id="balancePlus" class="btn-balance btn-balance-plus">+</button>
+                        <button id="balanceMinus" class="btn-balance btn-balance-minus">−</button>
+                    </div>
+                    <button id="balanceDelta" class="btn-balance btn-balance-delta">+ Дельта <span id="deltaValueOnBtn" style="opacity:0.45;font-size:0.85em;"></span></button>
+                </div>
+            </div>
+            <div class="table-container" style="flex:1;">
+                <table class="data-table summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label highlight">Пассивный доход</td>
+                            <td class="value readonly" id="passiveIncome">0</td>
+                        </tr>
+                        <tr>
+                            <td class="label highlight">Общий доход <span style="font-size:0.78rem;color:#666;font-weight:normal;display:block;">(Зарплата + Пассивный доход)</span></td>
+                            <td class="value readonly" id="totalIncome">0</td>
+                        </tr>
+                        <tr>
+                            <td class="label highlight">Общий расход</td>
+                            <td class="value readonly" id="totalExpenses">0</td>
+                        </tr>
+                        <tr>
+                            <td class="label highlight">Дельта <span style="font-size:0.78rem;color:#666;font-weight:normal;">(Доходы − Расходы)</span></td>
+                            <td class="value readonly" id="monthlyCashFlow">0</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Кол-во детей</td>
+                            <td><input type="text" id="childCount" inputmode="numeric" maxlength="1" value="0" class="currency-input"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Расходы на одного ребёнка</td>
+                            <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                <input type="text" id="perChildExpense" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="Введите значение">
+                                <button id="perChildConfirmBtn" class="btn-confirm">✓</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <div class="form-grid">
+            <!-- Активы -->
+            <section class="section">
+                <h2>Активы</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td class="label">Сбережения</td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="savings" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="Введите значение">
+                                    <button id="savingsConfirmBtn" class="btn-confirm">✓</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Акции</h3>
+                    <table class="data-table" id="stocks">
+                        <thead>
+                            <tr>
+                                <th>Акции</th>
+                                <th>Количество</th>
+                                <th>Цена</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="input-row">
+                                <td>
+                                    <div class="custom-multiselect">
+                                        <div class="multiselect-trigger">Выберите акцию</div>
+                                        <div class="multiselect-options">
+                                            <div class="multiselect-option" data-value="MYT4U">MYT4U</div>
+                                            <div class="multiselect-option" data-value="OK4U">OK4U</div>
+                                            <div class="multiselect-option" data-value="ON2U">ON2U</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="number" class="number-input qty-input" value="0"></td>
+                                <td><input type="number" class="currency-input price-input" value="0"></td>
+                                <td><button class="btn-icon add-row" data-table="stocks">+</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-footer">табл. Активы</div>
+                </div>
+            </section>
+
+            <!-- Пассивы -->
+            <section class="section">
+                <h2>Пассивы</h2>
+                <div class="table-container">
+                    <table class="data-table" id="liabilities">
+                        <tbody>
+                            <tr>
+                                <td class="label">Ипотека</td>
+                                <td><input type="text" id="mortgageDebt" class="currency-input" value="0" inputmode="numeric" maxlength="10"></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Банковский кредит</td>
+                                <td><input type="text" id="bankLoanDebt" class="currency-input" value="0" inputmode="numeric" maxlength="10"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Недвижимость/Бизнес</h3>
+                    <table class="data-table" id="realEstateLiabilities">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Ипотека</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="input-row">
+                                <td>
+                                    <div class="custom-multiselect">
+                                        <div class="multiselect-trigger">Выберите недвижимость</div>
+                                        <div class="multiselect-options">
+                                            <div class="multiselect-option" data-value="квартира на продажу 2/1">квартира на продажу 2/1</div>
+                                            <div class="multiselect-option" data-value="дом на продажу 3/2">дом на продажу 3/2</div>
+                                            <div class="multiselect-option" data-value="дуплекс на продажу">дуплекс на продажу</div>
+                                            <div class="multiselect-option" data-value="4-плекс на продажу">4-плекс на продажу</div>
+                                            <div class="multiselect-option" data-value="8-плекс на продажу">8-плекс на продажу</div>
+                                            <div class="multiselect-option" data-value="многоквартирный дом на продажу">многоквартирный дом на продажу</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="number" class="currency-input mortgage-input" value="0"></td>
+                                <td><button class="btn-icon add-row" data-table="realEstateLiabilities">+</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-footer">табл. Пассивы</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения поля -->
+    <div id="confirmFieldModal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h3 id="confirmFieldTitle">Подтверждение</h3>
+            <p style="margin:15px 0;font-size:1rem;">Вы ввели: <strong id="confirmFieldValue"></strong></p>
+            <p style="color:#666;margin-bottom:20px;">Правильно ввели значение?</p>
+            <div style="display:flex;gap:10px;">
+                <button id="confirmFieldOk" class="btn-primary" style="flex:1;">ОК</button>
+                <button id="confirmFieldCancel" class="btn-danger" style="flex:1;">Изменить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для сохранения -->
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Сохранить игру</h3>
+            <input type="text" id="saveName" placeholder="Название сохранения">
+            <button id="confirmSave" class="btn-primary">Сохранить</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
