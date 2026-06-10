@@ -4,25 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Денежный Поток</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#2f5d3a">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="header-top">
                 <h1>Денежный Поток</h1>
-                <input type="text" id="playerName" class="player-name-input" placeholder="Имя игрока" maxlength="30">
-                <input type="text" id="playerProfession" class="player-name-input" placeholder="Профессия" maxlength="40">
-            </div>
-            <div class="session-controls">
-                <select id="sessionSelect">
-                    <option value="">Новая игра</option>
-                </select>
-                <button id="saveBtn" class="btn-primary">Сохранить</button>
-                <button id="loadBtn" class="btn-secondary">Загрузить</button>
-                <button id="deleteBtn" class="btn-danger">Удалить</button>
+                <div class="header-columns">
+                    <!-- Левый блок: игрок -->
+                    <div class="header-left">
+                        <div class="header-left-row">
+                            <input type="text" id="playerName" class="player-name-input" placeholder="Имя игрока" maxlength="20">
+                            <div class="custom-multiselect profession-select">
+                                <div class="multiselect-trigger" id="playerProfession">Профессия</div>
+                                <div class="multiselect-options">
+                                    <div class="multiselect-option" data-value="IT-специалист">IT-специалист</div>
+                                    <div class="multiselect-option" data-value="Бариста">Бариста</div>
+                                    <div class="multiselect-option" data-value="Блогер">Блогер</div>
+                                    <div class="multiselect-option" data-value="Гид">Гид</div>
+                                    <div class="multiselect-option" data-value="Массажист">Массажист</div>
+                                    <div class="multiselect-option" data-value="Предприниматель">Предприниматель</div>
+                                    <div class="multiselect-option" data-value="Психолог">Психолог</div>
+                                    <div class="multiselect-option" data-value="Тренер">Тренер</div>
+                                    <div class="multiselect-option" data-value="Преподаватель йоги">Преподаватель йоги</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="saveBtn" class="btn-primary">Сохранить</button>
+                    </div>
+                    <!-- Правый блок: сессии -->
+                    <div class="header-right collapsed">
+                        <button type="button" class="header-right-title" id="gamesManageToggle">Управление игрой <span class="toggle-arrow">▾</span></button>
+                        <div class="header-right-body" id="gamesManageBody">
+                            <div class="current-game-label">Текущая игра: <span id="currentGameName">—</span></div>
+                            <label class="session-select-label" for="sessionSelect">Список игр</label>
+                            <select id="sessionSelect">
+                            </select>
+                            <div class="header-right-buttons">
+                                <button id="newGameBtn" class="btn-secondary">Начать новую игру</button>
+                                <button id="deleteBtn" class="btn-danger">Удалить игру</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -117,6 +147,7 @@
                                 <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
                                     <input type="text" id="mortgagePayment" class="currency-input expense-val income-field" value="" inputmode="numeric" maxlength="10" placeholder="0">
                                     <button id="mortgagePaymentConfirmBtn" class="btn-confirm">✓</button>
+                                    <button id="mortgagePaymentEditBtn" class="btn-edit" style="display:none;">✎</button>
                                 </td>
                             </tr>
                             <tr>
@@ -150,18 +181,39 @@
                 <div style="display:flex;gap:6px;align-items:center;">
                     <input type="text" id="currentBalance" class="balance-display-input" value="0" inputmode="numeric" maxlength="10" readonly>
                     <button id="balanceEditBtn" class="btn-confirm" style="width:28px;height:28px;">✎</button>
+                    <button id="balanceOkBtn" class="btn-confirm" style="width:auto;height:28px;padding:0 12px;display:none;">ОК</button>
                 </div>
                 <div class="balance-controls">
                     <div class="balance-input-row">
                         <input type="text" id="balanceInput" class="currency-input" inputmode="numeric" maxlength="10" placeholder="Добавить Расход / Доход" style="flex:1;">
                     </div>
                     <div class="balance-btn-row">
-                        <button id="balanceMinus" class="btn-balance btn-balance-minus">−</button>
                         <button id="balancePlus" class="btn-balance btn-balance-plus">+</button>
+                        <button id="balanceMinus" class="btn-balance btn-balance-minus">−</button>
                     </div>
                     <button id="balanceDelta" class="btn-balance btn-balance-delta">+ Дельта <span id="deltaValueOnBtn" style="opacity:0.45;font-size:0.85em;"></span></button>
+                    <button id="extraOpsToggle" class="btn-balance btn-extra-toggle">Доп. операции ▾</button>
+                    <div id="extraOpsBlock" class="extra-ops-block" style="display:none;">
+                        <button id="balanceCharity" class="btn-balance btn-balance-charity">Благотворительность <span id="charityValueOnBtn" style="opacity:0.55;font-size:0.85em;"></span></button>
+                        <button id="balanceFired" class="btn-balance btn-balance-fired">Увольнение <span id="firedValueOnBtn" style="opacity:0.55;font-size:0.85em;"></span></button>
+                    </div>
                 </div>
             </div>
+            <div class="goal-block">
+                <div class="goal-title">🎯 Цель первого круга</div>
+                <div class="goal-condition">Выбраться из Крысиных Бегов:<br><strong>Пассивный доход &gt; Общего расхода</strong></div>
+                <div class="goal-row goal-remain-row">
+                    <span class="goal-label">Остаток до цели по пассиву:</span>
+                    <span class="goal-value goal-remain" id="goalRemain">0</span>
+                </div>
+                <div class="goal-divider" id="goalBankDebtDivider"></div>
+                <div class="goal-row" id="goalBankDebtRow">
+                    <strong class="goal-label">Погасить банковский кредит:</strong>
+                    <span class="goal-value goal-debt" id="goalBankDebt">0</span>
+                </div>
+                <div class="goal-status" id="goalStatus"></div>
+            </div>
+
             <div class="table-container" style="flex:1;">
                 <table class="data-table summary-table">
                     <tbody>
@@ -182,14 +234,19 @@
                             <td class="value readonly" id="monthlyCashFlow">0</td>
                         </tr>
                         <tr>
-                            <td class="label">Кол-во детей</td>
-                            <td><input type="text" id="childCount" inputmode="numeric" maxlength="1" value="0" class="currency-input"></td>
+                            <td class="label">Количество детей</td>
+                            <td class="value" style="display:flex;justify-content:flex-end;align-items:center;gap:6px;">
+                                <button class="btn-counter" id="childCountMinus" onclick="app.changeChildCount(-1)">−</button>
+                                <span id="childCount" class="counter-value">0</span>
+                                <button class="btn-counter" id="childCountPlus" onclick="app.changeChildCount(1)">+</button>
+                            </td>
                         </tr>
                         <tr>
                             <td class="label">Расходы на одного ребёнка</td>
-                            <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
-                                <input type="text" id="perChildExpense" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="0">
+                            <td class="value" style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">
+                                <input type="text" id="perChildExpense" class="currency-input expense-val income-field" value="" inputmode="numeric" maxlength="10" placeholder="0">
                                 <button id="perChildConfirmBtn" class="btn-confirm">✓</button>
+                                <button id="perChildExpenseEditBtn" class="btn-edit" style="display:none;">✎</button>
                             </td>
                         </tr>
                     </tbody>
@@ -255,11 +312,19 @@
                         <tbody>
                             <tr>
                                 <td class="label">Ипотека</td>
-                                <td><input type="text" id="mortgageDebt" class="currency-input" value="0" inputmode="numeric" maxlength="10"></td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="mortgageDebt" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="0">
+                                    <button id="mortgageDebtConfirmBtn" class="btn-confirm">✓</button>
+                                    <button id="mortgageDebtEditBtn" class="btn-edit" style="display:none;">✎</button>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="label">Банковский кредит</td>
-                                <td><input type="text" id="bankLoanDebt" class="currency-input" value="0" inputmode="numeric" maxlength="10"></td>
+                                <td style="display:flex;gap:6px;align-items:center;border:none;padding:0;">
+                                    <input type="text" id="bankLoanDebt" class="currency-input income-field" value="" inputmode="numeric" maxlength="10" placeholder="0">
+                                    <button id="bankLoanDebtConfirmBtn" class="btn-confirm">✓</button>
+                                    <button id="bankLoanDebtEditBtn" class="btn-edit" style="display:none;">✎</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -288,7 +353,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><input type="number" class="currency-input mortgage-input" value="0"></td>
+                                <td><input type="text" class="currency-input mortgage-input" value="0" inputmode="numeric" maxlength="10"></td>
                                 <td><button class="btn-icon add-row" data-table="realEstateLiabilities">+</button></td>
                             </tr>
                         </tbody>
@@ -312,12 +377,24 @@
         </div>
     </div>
 
+    <!-- Модальное окно поздравления -->
+    <div id="celebrationModal" class="modal celebration-modal">
+        <div class="modal-content celebration-content">
+            <div class="confetti-container"></div>
+            <div class="celebration-emoji">🏆</div>
+            <h2>Поздравляем!</h2>
+            <p class="celebration-text">Вы выбрались из Крысиных Бегов!</p>
+            <p class="celebration-sub">Ваш пассивный доход превышает расходы.</p>
+            <button id="celebrationContinue" class="btn-primary">ОК</button>
+        </div>
+    </div>
+
     <!-- Модальное окно для сохранения -->
     <div id="saveModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Сохранить игру</h3>
-            <input type="text" id="saveName" placeholder="Название сохранения">
+            <input type="text" id="saveName" placeholder="Название сохранения" maxlength="35">
             <button id="confirmSave" class="btn-primary">Сохранить</button>
         </div>
     </div>
