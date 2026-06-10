@@ -141,6 +141,42 @@ header h1::before {
     flex-wrap: wrap;
 }
 
+.player-summary {
+    min-width: 260px;
+    max-width: 430px;
+    padding: 10px 16px;
+    border: 1.5px solid rgba(201, 162, 39, 0.55);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-summary strong {
+    color: #fff;
+}
+
+.player-summary-profession {
+    color: var(--gold-light);
+}
+
+.player-summary-placeholder {
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 600;
+}
+
+.header-left .player-name-input,
+.header-left .profession-select {
+    display: none;
+}
+
 .header-right {
     display: flex;
     flex-direction: column;
@@ -718,6 +754,12 @@ header h1::before {
         font-size: 14px;
     }
 
+    .multiselect-options.show {
+        max-height: min(260px, calc(100vh - 96px));
+        overflow-y: auto;
+        z-index: 99999;
+    }
+
     /* Buttons */
     .btn-primary,
     .btn-danger,
@@ -829,6 +871,47 @@ header h1::before {
     padding: 10px;
     background: #fbfdfa;
     border-radius: 8px;
+}
+
+.passive-income-panel {
+    margin-top: 12px;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    border-radius: 12px;
+    background: #fffef7;
+    overflow: visible;
+}
+
+.passive-income-toggle {
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #eaf5ea 0%, #f1e4b8 100%);
+    color: #2f5d3a;
+    cursor: pointer;
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.passive-income-toggle .toggle-arrow {
+    transition: transform 0.25s ease;
+}
+
+.passive-income-panel:not(.collapsed) .passive-income-toggle .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.passive-income-body {
+    padding: 10px;
+}
+
+.passive-income-panel.collapsed .passive-income-body {
+    display: none;
 }
 
 .data-table {
@@ -949,18 +1032,43 @@ input[type="text"]:focus {
     box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
 }
 
+.data-table .custom-multiselect .multiselect-trigger {
+    min-height: 40px;
+    padding: 8px 30px 8px 12px;
+    border: 2px solid #bdc3c7;
+    border-radius: 10px;
+    background: #fff;
+    color: #4d5b50;
+    font-weight: 600;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.data-table .custom-multiselect .multiselect-trigger:hover,
+.data-table .custom-multiselect .multiselect-trigger.active {
+    border-color: #c9a227;
+    background: #fffef7;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+
+.data-table .custom-multiselect .multiselect-trigger.has-value {
+    color: #2f5d3a;
+    border-color: #6aa86a;
+}
+
 .multiselect-options {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: fixed;
     background: white;
     border: 1px solid #ccc;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
-    z-index: 1000;
+    border-radius: 0 0 8px 8px;
+    z-index: 99999;
     display: none;
     min-width: 150px;
+    max-height: min(320px, calc(100vh - 24px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 12px 28px rgba(47, 93, 58, 0.18);
 }
 
 .multiselect-options.show {
@@ -1134,6 +1242,97 @@ input[type="text"]:focus {
 .modal-content button {
     width: 100%;
     padding: 12px;
+}
+
+.start-player-modal {
+    z-index: 1600;
+}
+
+.start-player-content {
+    max-width: 430px;
+}
+
+#startPlayerName {
+    background: #fff;
+    color: #2c3a2e;
+    caret-color: #2f5d3a;
+    -webkit-text-fill-color: #2c3a2e;
+    font-size: 16px;
+}
+
+#startPlayerName::placeholder {
+    color: #7b8580;
+    -webkit-text-fill-color: #7b8580;
+}
+
+.start-player-text {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    line-height: 1.45;
+}
+
+.start-player-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #2f5d3a;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.start-player-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+    background: white;
+    color: #2c3a2e;
+}
+
+
+.action-confirm-modal {
+    z-index: 1700;
+}
+
+.action-confirm-content {
+    max-width: 380px;
+    text-align: center;
+}
+
+.action-confirm-message {
+    color: #2c3a2e;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin-bottom: 20px;
+}
+
+.action-confirm-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-confirm-buttons button {
+    flex: 1;
+}
+
+.action-confirm-buttons .btn-secondary {
+    background: #eef6ea;
+    color: #2f5d3a;
+    border: 1.5px solid #9fc99f;
+    text-shadow: none;
+    box-shadow: 0 4px 12px rgba(47, 93, 58, 0.12);
+}
+
+.action-confirm-buttons .btn-secondary:hover,
+.action-confirm-buttons .btn-secondary:focus-visible {
+    background: #dcebd6;
+    color: #23462b;
+    border-color: #6aa86a;
+    outline: 3px solid rgba(106, 168, 106, 0.25);
+    outline-offset: 2px;
 }
 
 /* ===== Celebration Modal ===== */

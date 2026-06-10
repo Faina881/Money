@@ -20,12 +20,12 @@
                     <!-- Левый блок: игрок -->
                     <div class="header-left">
                         <div class="header-left-row">
+                            <div id="playerSummary" class="player-summary" aria-live="polite" hidden></div>
                             <input type="text" id="playerName" class="player-name-input" placeholder="Имя игрока" maxlength="20">
                             <div class="custom-multiselect profession-select">
                                 <div class="multiselect-trigger" id="playerProfession">Профессия</div>
                                 <div class="multiselect-options">
                                     <div class="multiselect-option" data-value="IT-специалист">IT-специалист</div>
-                                    <div class="multiselect-option" data-value="Бариста">Бариста</div>
                                     <div class="multiselect-option" data-value="Блогер">Блогер</div>
                                     <div class="multiselect-option" data-value="Гид">Гид</div>
                                     <div class="multiselect-option" data-value="Массажист">Массажист</div>
@@ -36,7 +36,6 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="saveBtn" class="btn-primary">Сохранить</button>
                     </div>
                     <!-- Правый блок: сессии -->
                     <div class="header-right collapsed">
@@ -73,6 +72,9 @@
                         </tbody>
                     </table>
                     
+                    <div class="passive-income-panel collapsed" id="passiveIncomePanel">
+                        <button type="button" class="passive-income-toggle" id="passiveIncomeToggle">Добавить Пассивный Доход <span class="toggle-arrow">▾</span></button>
+                        <div class="passive-income-body" id="passiveIncomeBody">
                     <h3>Недвижимость</h3>
                     <table class="data-table" id="realEstateIncome">
                         <thead>
@@ -132,6 +134,8 @@
                             </tr>
                         </tbody>
                     </table>
+                        </div>
+                    </div>
                     <div class="table-footer">табл. Доходы</div>
                 </div>
             </section>
@@ -364,6 +368,33 @@
         </div>
     </div>
 
+    <!-- Стартовое окно игрока -->
+    <div id="startPlayerModal" class="modal start-player-modal">
+        <div class="modal-content start-player-content">
+            <span id="startPlayerModalClose" class="close">&times;</span>
+            <h3>Начало игры</h3>
+            <p class="start-player-text">
+                Заполните имя игрока и выберите профессию, чтобы начать новую игру.
+                Если хотите продолжить сохранённую игру — закройте это окно.
+            </p>
+            <label class="start-player-label" for="startPlayerName">Имя игрока</label>
+            <input type="text" id="startPlayerName" placeholder="Имя игрока" maxlength="20" autocomplete="off" aria-label="Имя игрока">
+            <label class="start-player-label" for="startPlayerProfession">Профессия</label>
+            <select id="startPlayerProfession" aria-label="Профессия">
+                <option value="" disabled selected hidden>Профессия</option>
+                <option value="IT-специалист">IT-специалист</option>
+                <option value="Блогер">Блогер</option>
+                <option value="Гид">Гид</option>
+                <option value="Массажист">Массажист</option>
+                <option value="Предприниматель">Предприниматель</option>
+                <option value="Психолог">Психолог</option>
+                <option value="Тренер">Тренер</option>
+                <option value="Преподаватель йоги">Преподаватель йоги</option>
+            </select>
+            <button id="startPlayerSubmit" class="btn-primary">Начать игру</button>
+        </div>
+    </div>
+
     <!-- Модальное окно подтверждения поля -->
     <div id="confirmFieldModal" class="modal">
         <div class="modal-content" style="text-align:center;">
@@ -386,6 +417,17 @@
             <p class="celebration-text">Вы выбрались из Крысиных Бегов!</p>
             <p class="celebration-sub">Ваш пассивный доход превышает расходы.</p>
             <button id="celebrationContinue" class="btn-primary">ОК</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения действия -->
+    <div id="actionConfirmModal" class="modal action-confirm-modal">
+        <div class="modal-content action-confirm-content">
+            <p id="actionConfirmMessage" class="action-confirm-message"></p>
+            <div class="action-confirm-buttons">
+                <button id="actionConfirmOk" class="btn-primary" type="button">ОК</button>
+                <button id="actionConfirmCancel" class="btn-secondary" type="button">Отмена</button>
+            </div>
         </div>
     </div>
 

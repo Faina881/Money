@@ -5,6 +5,7 @@ class CashflowApp {
         this.currentSession = null;
         this._isRestoring = false;
         this._goalCelebrated = false;
+        this._autoSaveTimer = null;
         this.init();
     }
 
@@ -18,6 +19,10 @@ class CashflowApp {
         this._isRestoring = false;
         this.updateCalculations();
         this.updateGameAreaLock();
+        this.updatePlayerHeaderDisplay();
+        if (!this.arePlayerDetailsFilled()) {
+            this.showStartPlayerModal();
+        }
     }
 
     initCustomMultiselect() {
@@ -27,6 +32,46 @@ class CashflowApp {
             const trigger = multiselect.querySelector('.multiselect-trigger');
             const options = multiselect.querySelector('.multiselect-options');
             const optionElements = multiselect.querySelectorAll('.multiselect-option');
+            const originalParent = options.parentElement;
+
+            const resetOptionsPosition = (optionsEl) => {
+                optionsEl.style.position = '';
+                optionsEl.style.top = '';
+                optionsEl.style.left = '';
+                optionsEl.style.width = '';
+                optionsEl.style.maxHeight = '';
+                optionsEl.style.zIndex = '';
+            };
+
+            const closeDropdown = () => {
+                options.classList.remove('show');
+                resetOptionsPosition(options);
+
+                if (!trigger.dataset.selected && !trigger.classList.contains('has-value')) {
+                    trigger.classList.remove('active');
+                }
+
+                if (options.parentElement !== originalParent) {
+                    originalParent.appendChild(options);
+                }
+            };
+
+            const positionOptionsBelowTrigger = () => {
+                const rect = trigger.getBoundingClientRect();
+                const gap = 2;
+                const viewportBottomPadding = 8;
+                const availableBelow = Math.max(80, window.innerHeight - rect.bottom - viewportBottomPadding);
+                const maxHeight = Math.min(320, availableBelow);
+
+                options.style.position = 'fixed';
+                options.style.top = `${rect.bottom + gap}px`;
+                options.style.left = `${rect.left}px`;
+                options.style.width = `${rect.width}px`;
+                options.style.maxHeight = `${maxHeight}px`;
+                options.style.zIndex = '99999';
+            };
+
+            options.__closeDropdown = closeDropdown;
             
             // Toggle dropdown
             trigger.addEventListener('click', (e) => {
@@ -35,25 +80,21 @@ class CashflowApp {
 
                 // Close all other dropdowns
                 document.querySelectorAll('.multiselect-options.show').forEach(opt => {
-                    opt.classList.remove('show');
-                    opt.style.position = '';
-                    opt.style.top = '';
-                    opt.style.left = '';
-                    opt.style.width = '';
-                    opt.closest('.custom-multiselect').querySelector('.multiselect-trigger').classList.remove('active');
+                    if (opt !== options && typeof opt.__closeDropdown === 'function') {
+                        opt.__closeDropdown();
+                    } else if (opt !== options) {
+                        opt.classList.remove('show');
+                        resetOptionsPosition(opt);
+                    }
                 });
 
-                if (!isOpen) {
+                if (isOpen) {
+                    closeDropdown();
+                } else {
+                    document.body.appendChild(options);
+                    positionOptionsBelowTrigger();
                     options.classList.add('show');
                     trigger.classList.add('active');
-
-                    // Position options as fixed to escape stacking contexts
-                    const rect = trigger.getBoundingClientRect();
-                    options.style.position = 'fixed';
-                    options.style.top = (rect.bottom + 2) + 'px';
-                    options.style.left = rect.left + 'px';
-                    options.style.width = rect.width + 'px';
-                    options.style.zIndex = '9999';
                 }
             });
             
@@ -80,20 +121,29 @@ class CashflowApp {
                         this.handleProfessionSelect(option.dataset.value);
                         trigger.classList.add('locked');
                         trigger.style.pointerEvents = 'none';
+                        this.updatePlayerHeaderDisplay();
                         this.updateGameAreaLock();
                     }
 
                     // Close dropdown
-                    options.classList.remove('show');
+                    closeDropdown();
                 });
             });
             
             // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
-                if (!multiselect.contains(e.target)) {
-                    options.classList.remove('show');
+                if (!multiselect.contains(e.target) && !options.contains(e.target)) {
+                    closeDropdown();
                 }
             });
+
+            window.addEventListener('resize', () => {
+                if (options.classList.contains('show')) positionOptionsBelowTrigger();
+            });
+
+            window.addEventListener('scroll', () => {
+                if (options.classList.contains('show')) positionOptionsBelowTrigger();
+            }, true);
         });
     }
 
@@ -116,67 +166,58 @@ class CashflowApp {
             this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '4320');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
-        } else if (profession === 'Бариста') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '3100');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '200');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '46000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '180');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '400');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '1990');
-            this.updateCalculations();
-            this.setCurrentBalanceFromSavings();
         } else if (profession === 'Блогер') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '5600');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '300');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '78000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '270');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '700');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '3180');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '9500');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '400');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '143000');
+            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '480');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '1330');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '5570');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         } else if (profession === 'Гид') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '4200');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '250');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '62000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '220');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '550');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2480');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '1600');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '560');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '20000');
+            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '70');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '200');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '750');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         } else if (profession === 'Массажист') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '4800');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '250');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '71000');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '4900');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '400');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '75000');
             this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '250');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '640');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2810');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '700');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2510');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         } else if (profession === 'Психолог') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '6500');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '350');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '92000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '310');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '850');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '3750');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '4600');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '400');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '75000');
+            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '240');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '700');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2230');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         } else if (profession === 'Тренер') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '4500');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '250');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '65000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '230');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '580');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2620');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '3100');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '480');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '47000');
+            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '170');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '400');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '1580');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         } else if (profession === 'Преподаватель йоги') {
-            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '3800');
-            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '200');
-            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '55000');
-            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '200');
-            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '480');
-            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '2250');
+            this.lockFieldIfPossible('salary', 'salaryConfirmBtn', '3000');
+            this.lockFieldIfPossible('savings', 'savingsConfirmBtn', '520');
+            this.lockFieldIfPossible('mortgageDebt', 'mortgageDebtConfirmBtn', '46000');
+            this.lockFieldIfPossible('perChildExpense', 'perChildConfirmBtn', '160');
+            this.lockFieldIfPossible('mortgagePayment', 'mortgagePaymentConfirmBtn', '400');
+            this.lockFieldIfPossible('otherExpenses', 'otherExpensesConfirmBtn', '1480');
             this.updateCalculations();
             this.setCurrentBalanceFromSavings();
         }
@@ -185,17 +226,48 @@ class CashflowApp {
 
     triggerAutoSaveIfReady() {
         if (!this.arePlayerDetailsFilled()) return;
-        const playerName = document.getElementById('playerName')?.value.trim();
-        if (!playerName) return;
+        this.autoSave();
+    }
+
+    buildDefaultSessionName() {
+        const playerName = document.getElementById('playerName')?.value.trim() || 'Игрок';
         const now = new Date();
         const date = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}`;
-        const sessionName = `${playerName}_${date}`;
-        const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
-        sessions[sessionName] = this.collectData();
-        localStorage.setItem('cashflow_sessions', JSON.stringify(sessions));
-        this.currentSession = sessionName;
-        this.loadSessionList();
-        this.autoSave();
+        return `${playerName}_${date}`;
+    }
+
+    updatePlayerHeaderDisplay() {
+        const summary = document.getElementById('playerSummary');
+        if (!summary) return;
+
+        const playerName = document.getElementById('playerName')?.value.trim() || '';
+        const profession = document.getElementById('playerProfession')?.dataset.selected || '';
+
+        summary.textContent = '';
+        if (playerName && profession) {
+            summary.hidden = false;
+
+            const nameEl = document.createElement('strong');
+            nameEl.textContent = playerName;
+
+            const separatorEl = document.createElement('span');
+            separatorEl.setAttribute('aria-hidden', 'true');
+            separatorEl.textContent = ' · ';
+
+            const professionEl = document.createElement('span');
+            professionEl.className = 'player-summary-profession';
+            professionEl.textContent = profession;
+
+            summary.append(nameEl, separatorEl, professionEl);
+        } else {
+            summary.hidden = true;
+        }
+    }
+
+    scheduleAutoSave() {
+        if (this._isRestoring || !this.arePlayerDetailsFilled()) return;
+        clearTimeout(this._autoSaveTimer);
+        this._autoSaveTimer = setTimeout(() => this.autoSave(), 250);
     }
 
     setCurrentBalanceFromSavings() {
@@ -259,7 +331,7 @@ class CashflowApp {
 
     updateGameAreaLock() {
         const locked = !this.arePlayerDetailsFilled();
-        document.querySelectorAll('.form-grid, .balance-block').forEach(el => {
+        document.querySelectorAll('.form-grid, .balance-block, .passive-income-panel').forEach(el => {
             el.classList.toggle('not-ready', locked);
         });
     }
@@ -281,6 +353,104 @@ class CashflowApp {
 
     showPlayerDetailsRequiredMessage() {
         alert('Сначала заполните имя и выберите профессию.');
+    }
+
+    showStartPlayerModal() {
+        const modal = document.getElementById('startPlayerModal');
+        if (!modal) return;
+
+        const nameInput = document.getElementById('startPlayerName');
+        const professionSelect = document.getElementById('startPlayerProfession');
+        const currentName = document.getElementById('playerName')?.value.trim() || '';
+        const currentProfession = document.getElementById('playerProfession')?.dataset.selected || '';
+
+        if (nameInput) nameInput.value = currentName;
+        if (professionSelect) professionSelect.value = currentProfession;
+
+        modal.style.display = 'block';
+
+        setTimeout(() => {
+            if (nameInput && !nameInput.value.trim()) {
+                nameInput.focus();
+            } else if (professionSelect) {
+                professionSelect.focus();
+            }
+        }, 50);
+    }
+
+    hideStartPlayerModal() {
+        const modal = document.getElementById('startPlayerModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    showActionConfirm(message, onConfirm) {
+        const modal = document.getElementById('actionConfirmModal');
+        const messageEl = document.getElementById('actionConfirmMessage');
+        const okBtn = document.getElementById('actionConfirmOk');
+        const cancelBtn = document.getElementById('actionConfirmCancel');
+        if (!modal || !messageEl || !okBtn || !cancelBtn) return;
+
+        messageEl.textContent = message;
+        modal.style.display = 'block';
+
+        okBtn.onclick = () => {
+            this.hideActionConfirm();
+            if (typeof onConfirm === 'function') onConfirm();
+        };
+        cancelBtn.onclick = () => this.hideActionConfirm();
+
+        setTimeout(() => cancelBtn.focus(), 50);
+    }
+
+    hideActionConfirm() {
+        const modal = document.getElementById('actionConfirmModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    openGamesManageBlock() {
+        const block = document.getElementById('gamesManageToggle')?.closest('.header-right');
+        if (block) block.classList.remove('collapsed');
+
+        const select = document.getElementById('sessionSelect');
+        if (select) setTimeout(() => select.focus(), 50);
+    }
+
+    closeGamesManageBlock() {
+        const block = document.getElementById('gamesManageToggle')?.closest('.header-right');
+        if (block) block.classList.add('collapsed');
+    }
+
+    applyPlayerDetails(name, profession) {
+        const playerNameInput = document.getElementById('playerName');
+        if (playerNameInput) {
+            playerNameInput.value = name;
+            playerNameInput.readOnly = true;
+            playerNameInput.classList.add('locked');
+        }
+
+        const trigger = document.getElementById('playerProfession');
+        if (trigger) {
+            trigger.textContent = profession;
+            trigger.dataset.selected = profession;
+            trigger.style.color = '#333';
+            trigger.classList.add('has-value');
+            trigger.classList.add('active');
+            trigger.classList.add('locked');
+            trigger.style.pointerEvents = 'none';
+
+            const multiselect = trigger.closest('.custom-multiselect');
+            if (multiselect) {
+                multiselect.querySelectorAll('.multiselect-option').forEach(option => {
+                    option.classList.toggle('selected', option.dataset.value === profession);
+                });
+            }
+        }
+
+        this.handleProfessionSelect(profession);
+        this.updatePlayerHeaderDisplay();
+        this.updateGameAreaLock();
+        this.closeGamesManageBlock();
+        this.autoSave();
     }
 
     registerServiceWorker() {
@@ -313,16 +483,64 @@ class CashflowApp {
         if (playerNameInput) {
             playerNameInput.addEventListener('input', () => {
                 playerNameInput.value = playerNameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s\-]/g, '');
+                this.updatePlayerHeaderDisplay();
             });
             playerNameInput.addEventListener('blur', () => {
                 if (playerNameInput.value.trim()) {
                     playerNameInput.readOnly = true;
                     playerNameInput.classList.add('locked');
+                    this.updatePlayerHeaderDisplay();
                     if (this.arePlayerDetailsFilled()) this.autoSave();
                 }
                 this.updateGameAreaLock();
             });
         }
+
+        const startPlayerNameInput = document.getElementById('startPlayerName');
+        if (startPlayerNameInput) {
+            startPlayerNameInput.addEventListener('input', () => {
+                startPlayerNameInput.value = startPlayerNameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s\-]/g, '');
+            });
+        }
+
+        document.getElementById('startPlayerModalClose')?.addEventListener('click', () => {
+            this.hideStartPlayerModal();
+            this.openGamesManageBlock();
+        });
+
+        document.getElementById('startPlayerSubmit')?.addEventListener('click', () => {
+            const name = document.getElementById('startPlayerName')?.value.trim();
+            const profession = document.getElementById('startPlayerProfession')?.value;
+
+            if (!name) {
+                alert('Введите имя игрока');
+                document.getElementById('startPlayerName')?.focus();
+                return;
+            }
+
+            if (!profession) {
+                alert('Выберите профессию');
+                document.getElementById('startPlayerProfession')?.focus();
+                return;
+            }
+
+            this.startNewGame(false);
+            this.applyPlayerDetails(name, profession);
+            this.hideStartPlayerModal();
+            this.updateGameAreaLock();
+        });
+
+        document.addEventListener('input', (e) => {
+            if (!e.target.matches('input, select, textarea')) return;
+            if (e.target.closest('#startPlayerModal, #saveModal')) return;
+            this.scheduleAutoSave();
+        });
+
+        document.addEventListener('change', (e) => {
+            if (!e.target.matches('input, select, textarea')) return;
+            if (e.target.closest('#startPlayerModal, #saveModal')) return;
+            this.scheduleAutoSave();
+        });
 
         const saveNameInput = document.getElementById('saveName');
         if (saveNameInput) {
@@ -684,7 +902,7 @@ class CashflowApp {
             btn.addEventListener('click', (e) => this.addRow(e.target.dataset.table));
         });
 
-        // Validate add-row buttons for realEstateIncome, businessIncome, stocks
+        // Validate add-row buttons for realEstateIncome, businessIncome, stocks, realEstateLiabilities
         const validateAddRowBtn = (tableId) => {
             const table = document.getElementById(tableId);
             if (!table) return;
@@ -693,16 +911,20 @@ class CashflowApp {
             const incomeInput = inputRow.querySelector('.income-val');
             const qtyInput = inputRow.querySelector('.qty-input');
             const priceInput = inputRow.querySelector('.price-input');
+            const mortgageInput = inputRow.querySelector('.mortgage-input');
             const addBtn = inputRow.querySelector('.add-row');
 
             const hasSelection = multiselect && multiselect.querySelector('.multiselect-trigger.active');
             const hasIncome = incomeInput && incomeInput.value && incomeInput.value !== '0' && incomeInput.value !== '';
             const hasQty = qtyInput && qtyInput.value && qtyInput.value !== '0' && qtyInput.value !== '';
             const hasPrice = priceInput && priceInput.value && priceInput.value !== '0' && priceInput.value !== '';
+            const hasMortgage = mortgageInput && mortgageInput.value && mortgageInput.value !== '0' && mortgageInput.value !== '';
 
             let isValid = false;
             if (tableId === 'stocks') {
                 isValid = hasSelection && hasQty && hasPrice;
+            } else if (tableId === 'realEstateLiabilities') {
+                isValid = hasSelection && hasMortgage;
             } else {
                 isValid = hasSelection && hasIncome;
             }
@@ -710,7 +932,7 @@ class CashflowApp {
             if (addBtn) addBtn.disabled = !isValid;
         };
 
-        ['realEstateIncome', 'businessIncome', 'stocks'].forEach(tableId => {
+        ['realEstateIncome', 'businessIncome', 'stocks', 'realEstateLiabilities'].forEach(tableId => {
             const table = document.getElementById(tableId);
             if (!table) return;
 
@@ -750,47 +972,48 @@ class CashflowApp {
             });
             sessionSelect.addEventListener('change', () => {
                 const newValue = sessionSelect.value;
-                if (newValue === '') {
-                    this.startNewGame();
+                if (!newValue) {
                     lastValue = '';
-                } else {
-                    lastValue = newValue;
-                    this.loadSession();
+                    return;
                 }
+
+                lastValue = newValue;
+                this.loadSession();
+                this.hideStartPlayerModal();
             });
         }
 
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            if (this.currentSession) {
-                const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
-                sessions[this.currentSession] = this.collectData();
-                localStorage.setItem('cashflow_sessions', JSON.stringify(sessions));
-                this.autoSave();
-                alert(`Сохранено: ${this.currentSession}`);
-            } else {
-                this.showSaveModal();
-            }
-        });
         document.getElementById('newGameBtn').addEventListener('click', () => {
-            if (confirm('Точно хотите начать новую игру? Все текущие несохраненные данные будут стерты.')) {
+            this.showActionConfirm('Точно хотите начать новую игру? Текущие несохранённые данные будут сброшены.', () => {
                 this.startNewGame();
-            }
+            });
         });
         document.getElementById('deleteBtn').addEventListener('click', () => this.deleteSession());
         document.getElementById('gamesManageToggle')?.addEventListener('click', () => {
             const block = document.getElementById('gamesManageToggle').closest('.header-right');
             if (block) block.classList.toggle('collapsed');
         });
+        document.getElementById('passiveIncomeToggle')?.addEventListener('click', () => {
+            const block = document.getElementById('passiveIncomePanel');
+            if (block) block.classList.toggle('collapsed');
+        });
         document.getElementById('confirmSave').addEventListener('click', () => this.saveGame());
         
         // Modal close
-        document.querySelector('.close').addEventListener('click', () => {
+        document.querySelector('#saveModal .close')?.addEventListener('click', () => {
             document.getElementById('saveModal').style.display = 'none';
         });
 
         window.addEventListener('click', (e) => {
             if (e.target === document.getElementById('saveModal')) {
                 document.getElementById('saveModal').style.display = 'none';
+            }
+            if (e.target === document.getElementById('startPlayerModal')) {
+                this.hideStartPlayerModal();
+                this.openGamesManageBlock();
+            }
+            if (e.target === document.getElementById('actionConfirmModal')) {
+                this.hideActionConfirm();
             }
         });
 
@@ -1275,6 +1498,27 @@ class CashflowApp {
         if (this._isRestoring) return;
         try {
             const data = this.collectData();
+            if (this.arePlayerDetailsFilled()) {
+                const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
+                const hadSession = Boolean(this.currentSession);
+                let sessionName = this.currentSession || this.buildDefaultSessionName();
+                if (!hadSession && sessions[sessionName]) {
+                    const baseName = sessionName;
+                    let version = 2;
+                    while (sessions[`${baseName}_${version}`]) version++;
+                    sessionName = `${baseName}_${version}`;
+                }
+                this.currentSession = sessionName;
+                data.currentSession = sessionName;
+                sessions[sessionName] = data;
+                localStorage.setItem('cashflow_sessions', JSON.stringify(sessions));
+                if (hadSession) {
+                    const currentGameNameEl = document.getElementById('currentGameName');
+                    if (currentGameNameEl) currentGameNameEl.textContent = this.currentSession || '—';
+                } else {
+                    this.loadSessionList();
+                }
+            }
             localStorage.setItem('cashflow_autosave', JSON.stringify(data));
         } catch (e) {
             console.error('Failed to autosave:', e);
@@ -1429,10 +1673,22 @@ class CashflowApp {
     loadSessionList() {
         const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
         const select = document.getElementById('sessionSelect');
+        if (!select) return;
+
         const currentValue = this.currentSession || select.value;
+        const sessionNames = Object.keys(sessions);
         
         select.innerHTML = '';
-        Object.keys(sessions).forEach(name => {
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        placeholder.hidden = true;
+        select.appendChild(placeholder);
+
+        sessionNames.forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
@@ -1441,6 +1697,8 @@ class CashflowApp {
         
         if (currentValue && sessions[currentValue]) {
             select.value = currentValue;
+        } else {
+            select.value = '';
         }
 
         const currentGameNameEl = document.getElementById('currentGameName');
@@ -1469,10 +1727,11 @@ class CashflowApp {
         this.currentSession = name;
         this._isRestoring = false;
         this.autoSave();
+        this.updateGameAreaLock();
         alert('Игра загружена!');
     }
 
-    startNewGame() {
+    startNewGame(showModal = true) {
         this._isRestoring = true;
         this._goalCelebrated = false;
 
@@ -1586,12 +1845,16 @@ class CashflowApp {
         this.currentSession = null;
         const select = document.getElementById('sessionSelect');
         if (select) select.value = '';
+        const currentGameNameEl = document.getElementById('currentGameName');
+        if (currentGameNameEl) currentGameNameEl.textContent = '—';
         
         // Remove autosave
         localStorage.removeItem('cashflow_autosave');
         
         this._isRestoring = false;
         this.updateCalculations();
+        this.updatePlayerHeaderDisplay();
+        if (showModal) this.showStartPlayerModal();
     }
 
     restoreData(data) {
@@ -1704,6 +1967,7 @@ class CashflowApp {
             profTrigger.classList.add('locked');
             profTrigger.style.pointerEvents = 'none';
         }
+        this.updatePlayerHeaderDisplay();
     }
 
     clearTable(tableId) {
@@ -1763,18 +2027,16 @@ class CashflowApp {
             alert('Выберите сохранение для удаления');
             return;
         }
-        
-        if (!confirm(`Удалить игру "${name}"?`)) {
-            return;
-        }
-        
-        const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
-        delete sessions[name];
-        localStorage.setItem('cashflow_sessions', JSON.stringify(sessions));
-        
-        this.currentSession = null;
-        this.loadSessionList();
-        alert('Сохранение удалено');
+
+        this.showActionConfirm(`Удалить игру "${name}"?`, () => {
+            const sessions = JSON.parse(localStorage.getItem('cashflow_sessions') || '{}');
+            delete sessions[name];
+            localStorage.setItem('cashflow_sessions', JSON.stringify(sessions));
+
+            this.currentSession = null;
+            this.loadSessionList();
+            alert('Сохранение удалено');
+        });
     }
 }
 

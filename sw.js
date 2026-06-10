@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashflow-v1';
+const CACHE_NAME = 'cashflow-v11';
 const urlsToCache = [
   '/',
   '/index.html',
